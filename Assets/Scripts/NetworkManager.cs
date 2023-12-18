@@ -9,15 +9,35 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        if (PhotonNetwork.IsConnected)
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        base.OnConnectedToMaster();
+        JoinOrCreateRoom();
+    }
+
+    void JoinOrCreateRoom()
+    {
+        PhotonNetwork.JoinOrCreateRoom("GameRoom", new Photon.Realtime.RoomOptions { MaxPlayers = 4 }, null);
+    }
+
+    public override void OnJoinedRoom()
+    {
+        base.OnJoinedRoom();
+        SpawnPlayer();
+    }
+
+    void SpawnPlayer()
+    {
+        if (playerPrefab != null && spawnPoint != null)
         {
-            // Instantiate Player Prefab at the spawn position
-           PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint.position, spawnPoint.rotation);
-            Debug.LogError("Player should be spawned.");
+            PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint.position, spawnPoint.rotation);
+            Debug.Log("Player spawned.");
         }
         else
         {
-            Debug.LogError("Photon Network Not Connected!");
+            Debug.LogError("Error spawning player!");
         }
     }
 }
